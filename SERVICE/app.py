@@ -23,7 +23,7 @@ def get_gpt3_results(prompt: str):
     }
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
     if response.status_code == 200:
-        return response.json()["choices"][0].message.content.trim()
+        return response.json()["choices"][0]["message"]["content"]
     else:
         return {"error": "Failed to get GPT-3.5-turbo results."}
 
