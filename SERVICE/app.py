@@ -6,13 +6,15 @@ import uvicorn
 
 app = FastAPI()
 
+headers = {
+    "Authorization": "Bearer xxxx",
+    "Content-Type": "application/json"
+}
+
 @app.get("/gpt3")
 def get_gpt3_results(prompt: str):
     print(prompt)
-    headers = {
-        "Authorization": "Bearer xxxx",
-        "Content-Type": "application/json"
-    }
+
     data = {
         "model": "gpt-3.5-turbo",
         "max_tokens": 100,
@@ -27,10 +29,6 @@ def get_gpt3_results(prompt: str):
 
 @app.get("/dalle2")
 def get_dalle2_image(prompt: str):
-    headers = {
-        "Authorization": "Bearer xxxxx",
-        "Content-Type": "application/json"
-    }
     data = {
         "prompt": prompt,
         "model": "image-alpha-001",
@@ -86,7 +84,6 @@ with gr.Blocks() as demo:
                 show_label=False,
                 placeholder="Enter text and press enter, or upload an image",
             ).style(container=False)
-            txt.select(lambda x: "Hello, " + x + " demo1 !")
         with gr.Column(scale=0.15, min_width=0):
             btn = gr.UploadButton("📁", file_types=["image", "video", "audio"])
 
