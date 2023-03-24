@@ -10,7 +10,7 @@ app = FastAPI()
 def get_gpt3_results(prompt: str):
     print(prompt)
     headers = {
-        "Authorization": "Bearer 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",
+        "Authorization": "Bearer xxxx",
         "Content-Type": "application/json"
     }
     data = {
@@ -28,7 +28,7 @@ def get_gpt3_results(prompt: str):
 @app.get("/dalle2")
 def get_dalle2_image(prompt: str):
     headers = {
-        "Authorization": "Bearer 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",
+        "Authorization": "Bearer xxxxx",
         "Content-Type": "application/json"
     }
     data = {
