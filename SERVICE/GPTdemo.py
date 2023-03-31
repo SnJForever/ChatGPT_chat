@@ -2,6 +2,7 @@ import gradio as gr
 import openai
 import requests
 import csv
+import uuid
 
 
 prompt_templates = {"Default ChatGPT": ""}
@@ -72,8 +73,10 @@ def submit_message(type_select,user_token, prompt, prompt_template, temperature,
     
     try:
         if type_select=='TEXT':
-            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=system_prompt + history[-context_length*2:] + [prompt_msg], temperature=temperature, max_tokens=max_tokens)
-
+            text_history = [x for x in history if x['role'] != 'image' ]
+            print(text_history)
+            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=system_prompt + text_history[-context_length*2:] + [prompt_msg], temperature=temperature, max_tokens=max_tokens)
+            print(prompt_msg,completion.choices[0].message.to_dict())
             history.append(prompt_msg)
             history.append(completion.choices[0].message.to_dict())
 
@@ -84,11 +87,13 @@ def submit_message(type_select,user_token, prompt, prompt_template, temperature,
                     n=1,
                     size="512x512"
                     )
+            print("image result ",response)
             image_url = response['data'][0]['url']
-            history.append(prompt)
-            history.append(image_url)
 
-            # state['total_tokens'] += completion['usage']['total_tokens']
+            history.append({ "role": "image", "content": prompt })
+            history.append({ "role": "image", "content": image_url })
+
+            state['total_tokens'] += 0
             
     except Exception as e:
         history.append(prompt_msg)
@@ -98,8 +103,25 @@ def submit_message(type_select,user_token, prompt, prompt_template, temperature,
         })
 
     total_tokens_used_msg = f"Total tokens used: {state['total_tokens']}"
-    chat_messages = [(history[i]['content'], history[i+1]['content']) for i in range(0, len(history)-1, 2)]
 
+    chat_messages = [(history[i]['content'], history[i+1]['content']) for i in range(0, len(history)-1, 2)]
+    print(1,chat_messages)
+    chat_messages=[]
+    for i in range(0, len(history)-1, 2):
+        print(history[i])
+        if(history[i]['role'] == 'image'):
+            picture_name = str(uuid.uuid1())+'.png'
+            reponse = requests.get(history[i+1]['content'])
+            with open('/home/user/app/'+picture_name,'wb') as f:
+                f.write(reponse.content)
+            
+            image_his = {'name': '/home/user/app/'+picture_name, 'mime_type': 'image/png', 'alt_text': None, 'data': None, 'is_file': True}
+            
+            chat_messages.append((history[i]['content'],image_his))
+
+        else:
+            chat_messages.append((history[i]['content'], history[i+1]['content']))
+    print(2,chat_messages)
     return '', chat_messages, total_tokens_used_msg, state
 
 def clear_conversation():
