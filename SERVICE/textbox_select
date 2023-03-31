@@ -1,0 +1,18 @@
+import gradio as gr
+
+def predict_animal(animal):
+    if animal == "狗":
+        return "这是一只狗"
+    elif animal == "猫":
+        return "这是一只猫"
+    elif animal == "鸟":
+        return "这是一只鸟"
+    else:
+        return "未知的动物"
+
+animal_options = ["狗", "猫", "鸟"]
+animal_select = gr.inputs.Dropdown(label="请选择一个动物", choices=animal_options)
+output_text = gr.outputs.Textbox(label="预测结果")
+
+interface = gr.Interface(fn=predict_animal, inputs=animal_select, outputs=output_text, title="动物识别")
+interface.launch()
