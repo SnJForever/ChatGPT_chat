@@ -100,6 +100,8 @@ with gr.Blocks() as demo:
         dalle2_bot, chatbot, chatbot
     )
 
+app = gr.mount_gradio_app(app, demo, path="/gradio",gradio_api_url="http://localhost:7860/")
+
 if __name__ == "__main__":
-  demo.launch(share=True)
-  uvicorn.run(app='2_get:app', host="127.0.0.1", port=9806,reload=True, debug=True)
+    # demo.launch(share=True)
+    uvicorn.run(app='app:app', host="localhost", port=7860,reload=True)
